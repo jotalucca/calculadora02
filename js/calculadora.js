@@ -8,12 +8,11 @@ function calcularPlanos() {
     const operadoraA = calcularOperadoraA(idade, peso, altura);
     const operadoraB = calcularOperadoraB(peso, altura);
   
-    // Determinar o plano mais vantajoso
-    const planoMaisVantajosoA = determinarPlanoMaisVantajoso(operadoraA);
-    const planoMaisVantajosoB = determinarPlanoMaisVantajoso(operadoraB);
+    // Determinar o plano mais vantajoso entre as operadoras
+    const planoMaisVantajoso = determinarPlanoMaisVantajoso(operadoraA, operadoraB);
   
     // Exibir resultados na página
-    exibirResultados(operadoraA, operadoraB, planoMaisVantajosoA, planoMaisVantajosoB);
+    exibirResultados(operadoraA, operadoraB, planoMaisVantajoso);
   }
   
   function calcularOperadoraA(idade, peso, altura) {
@@ -57,21 +56,33 @@ function calcularPlanos() {
     return peso / ((altura / 100) * (altura / 100));
   }
   
-  function determinarPlanoMaisVantajoso(operadora) {
-    const precos = Object.values(operadora);
-    const menorPreco = Math.min(...precos);
-    const planoMaisVantajoso = Object.keys(operadora).find(plano => operadora[plano] === menorPreco);
+  function determinarPlanoMaisVantajoso(operadoraA, operadoraB) {
+    const precosA = Object.values(operadoraA);
+    const precosB = Object.values(operadoraB);
+  
+    const menorPrecoA = Math.min(...precosA);
+    const menorPrecoB = Math.min(...precosB);
+  
     return {
-      plano: planoMaisVantajoso,
-      preco: menorPreco
+      operadora: menorPrecoA < menorPrecoB ? 'Operadora A' : 'Operadora B',
+      plano: menorPrecoA < menorPrecoB ? Object.keys(operadoraA).find(plano => operadoraA[plano] === menorPrecoA) : Object.keys(operadoraB).find(plano => operadoraB[plano] === menorPrecoB),
+      preco: menorPrecoA < menorPrecoB ? menorPrecoA : menorPrecoB
     };
   }
   
-  function exibirResultados(operadoraA, operadoraB, planoMaisVantajosoA, planoMaisVantajosoB) {
+  function exibirResultados(operadoraA, operadoraB, planoMaisVantajoso) {
     const resultadoElement = document.getElementById('resultado');
+    let destaqueMensagem = '';
+  
+    if (planoMaisVantajoso.operadora === 'Operadora A') {
+      destaqueMensagem = 'O plano mais vantajoso é o da Operadora A.';
+    } else {
+      destaqueMensagem = 'O plano mais vantajoso é o da Operadora B.';
+    }
   
     resultadoElement.innerHTML = `
       <h4>Resultados:</h4>
+      <p>${destaqueMensagem}</p>
       <table class="table">
         <thead>
           <tr>
@@ -96,15 +107,10 @@ function calcularPlanos() {
             <td>${operadoraA.premium.toFixed(2)}</td>
             <td>${operadoraB.premium.toFixed(2)}</td>
           </tr>
-          <tr class="${planoMaisVantajosoA.plano === 'basico' ? 'destacado' : ''}">
-            <td>Mais Vantajoso (A)</td>
-            <td>${planoMaisVantajosoA.preco.toFixed(2)}</td>
-            <td></td>
-          </tr>
-          <tr class="${planoMaisVantajosoB.plano === 'basico' ? 'destacado' : ''}">
-            <td>Mais Vantajoso (B)</td>
-            <td></td>
-            <td>${planoMaisVantajosoB.preco.toFixed(2)}</td>
+          <tr class="destacado">
+            <td>Mais Vantajoso</td>
+            <td>${planoMaisVantajoso.operadora === 'Operadora A' ? planoMaisVantajoso.preco.toFixed(2) : ''}</td>
+            <td>${planoMaisVantajoso.operadora === 'Operadora B' ? planoMaisVantajoso.preco.toFixed(2) : ''}</td>
           </tr>
         </tbody>
       </table>
